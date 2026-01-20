@@ -9,7 +9,6 @@
 :root{
   --primary:#4b164c;
   --secondary:#9c27b0;
-  --bg:#f4f5fb;
 }
 
 body{
@@ -100,14 +99,8 @@ th{
   color:#fff;
 }
 
-.hidden{
-  display:none;
-}
-
-.actions button{
-  margin:2px;
-  font-size:12px;
-}
+.hidden{display:none}
+.actions button{margin:2px;font-size:12px}
 </style>
 </head>
 
@@ -129,7 +122,9 @@ th{
     <h2>Add / Edit Event Result</h2>
 
     <label>Event</label>
-    <select id="eventSelect"></select>
+    <select id="eventSelect">
+      <option value="">-- Select Event --</option>
+    </select>
 
     <label>Category</label>
     <select id="category" onchange="toggleGroupParticipants()">
@@ -139,19 +134,18 @@ th{
 
     <div id="individualFields">
       <label>Participant Name</label>
-      <input id="participant" placeholder="Participant name">
+      <input id="participant">
     </div>
 
     <div id="groupFields" class="hidden">
       <label>Group Participants (one per line)</label>
-      <textarea id="groupParticipants" rows="4"
-        placeholder="Participant 1&#10;Participant 2&#10;Participant 3"></textarea>
+      <textarea id="groupParticipants" rows="4"></textarea>
     </div>
 
     <label>Department</label>
-    <input id="department" placeholder="Department">
+    <input id="department">
 
-    <label>Year of Course</label>
+    <label>Year</label>
     <select id="year">
       <option>1st Year</option>
       <option>2nd Year</option>
@@ -225,22 +219,20 @@ const points = {
   Group:{First:10, Second:6, Third:2}
 };
 
-window.onload = function () {
-
+window.onload = function(){
   const eventSelect = document.getElementById("eventSelect");
 
-  events.forEach(e => {
+  events.forEach(e=>{
     let opt = document.createElement("option");
     opt.value = e;
-    opt.text = e;
-    eventSelect.add(opt);
+    opt.textContent = e;
+    eventSelect.appendChild(opt);
   });
-
 };
 
 function login(){
-  if(document.getElementById("pass").value === PASSWORD){
-    document.getElementById("panel").classList.remove("hidden");
+  if(pass.value === PASSWORD){
+    panel.classList.remove("hidden");
     loadAdminResults();
   } else {
     alert("Wrong password");
@@ -248,44 +240,34 @@ function login(){
 }
 
 function toggleGroupParticipants(){
-  const isGroup = document.getElementById("category").value === "Group";
-  document.getElementById("groupFields").classList.toggle("hidden", !isGroup);
-  document.getElementById("individualFields").classList.toggle("hidden", isGroup);
+  const isGroup = category.value === "Group";
+  groupFields.classList.toggle("hidden", !isGroup);
+  individualFields.classList.toggle("hidden", isGroup);
 }
 
 function saveResult(){
 
   const eventName = eventSelect.value;
+  if(!eventName){
+    alert("Please select an event");
+    return;
+  }
+
   const categoryVal = category.value;
   const positionVal = position.value;
   const groupName = group.value;
-
   const pts = points[categoryVal][positionVal];
 
   let participants = [];
   let participantName = participant.value;
 
   if(categoryVal === "Group"){
-    participants = groupParticipants.value
-      .split("\n")
-      .map(p => p.trim())
-      .filter(p => p);
+    participants = groupParticipants.value.split("\n").map(p=>p.trim()).filter(p=>p);
     participantName = participants.join(", ");
-  }
-
-  if(!eventName){
-    alert("Please select an event");
-    return;
-  }
-
-  if(categoryVal === "Individual" && !participantName){
-    alert("Enter participant name");
-    return;
   }
 
   let data = JSON.parse(localStorage.getItem("nattya") || "[]");
 
-  // Remove existing result for same event + same position
   data = data.filter(r => !(r.event === eventName && r.position === positionVal));
 
   const obj = {
@@ -312,23 +294,21 @@ function saveResult(){
   clearForm();
   loadAdminResults();
 
-  alert("Result saved / updated successfully");
+  alert("Result saved successfully");
 }
 
 function loadAdminResults(){
   let data = JSON.parse(localStorage.getItem("nattya") || "[]");
-  let t = document.getElementById("adminResults");
-  t.innerHTML = "";
+  adminResults.innerHTML = "";
 
   data.forEach((d,i)=>{
-    let r = t.insertRow();
+    let r = adminResults.insertRow();
     r.insertCell(0).innerText = d.event;
     r.insertCell(1).innerText = d.participant;
     r.insertCell(2).innerText = d.group;
     r.insertCell(3).innerText = d.position;
 
     let act = r.insertCell(4);
-    act.className = "actions";
     act.innerHTML =
       `<button onclick="editResult(${i})">Edit</button>
        <button onclick="deleteResult(${i})">Delete</button>`;
@@ -338,19 +318,16 @@ function loadAdminResults(){
 function editResult(i){
   let data = JSON.parse(localStorage.getItem("nattya") || "[]");
   let d = data[i];
-
   editIndex = i;
 
   eventSelect.value = d.event;
   category.value = d.category;
   toggleGroupParticipants();
-
   participant.value = d.participant;
   department.value = d.department;
   year.value = d.year;
   group.value = d.group;
   position.value = d.position;
-
   if(d.category === "Group"){
     groupParticipants.value = (d.participants || []).join("\n");
   }
