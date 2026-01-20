@@ -3,52 +3,126 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NATTYA 2026 – Results</title>
-
+<title>NATTYA 2026 – Official Results</title>
 <style>
-:root{--primary:#4b164c;--secondary:#9c27b0}
-body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(180deg,#f7f3fb,#f0ecf7);margin:0;color:#333}
-header{background:linear-gradient(135deg,#2c0a2f,var(--primary),var(--secondary));color:#fff;padding:35px;text-align:center}
-header img{height:90px;margin-bottom:10px}
-header h1{margin:0;font-size:36px}
-header p{margin:6px 0 0;font-size:15px;opacity:.9}
+:root{
+  --primary:#4b164c;
+  --secondary:#9c27b0;
+  --gold:#d4af37;
+  --silver:#c0c0c0;
+  --bronze:#cd7f32;
+}
+body{
+  font-family:'Segoe UI',Arial,sans-serif;
+  background:linear-gradient(180deg,#f7f3fb,#f0ecf7);
+  margin:0;
+  color:#333;
+}
+header{
+  background:linear-gradient(135deg,#2c0a2f,var(--primary),var(--secondary));
+  color:#fff;
+  padding:40px 20px;
+  text-align:center;
+}
+header img{height:90px;margin-bottom:12px}
+header h1{margin:0;font-size:38px;letter-spacing:2px}
+header p{margin:8px 0 0;font-size:15px;opacity:.9}
 
-.container{max-width:1200px;margin:50px auto;background:#fff;padding:35px;border-radius:18px;box-shadow:0 15px 35px rgba(0,0,0,.12)}
-h2{color:var(--primary);border-left:6px solid var(--secondary);padding-left:12px}
+.container{
+  max-width:1200px;
+  margin:40px auto;
+  background:#fff;
+  padding:35px;
+  border-radius:20px;
+  box-shadow:0 18px 40px rgba(0,0,0,.12);
+}
 
-.search-box{width:100%;padding:12px;margin:15px 0 25px;border-radius:8px;border:1px solid #ccc;font-size:15px}
+h2{
+  color:var(--primary);
+  border-left:6px solid var(--secondary);
+  padding-left:14px;
+  margin-bottom:18px;
+  font-size:24px;
+}
+
+.search-box{
+  width:100%;
+  padding:14px 16px;
+  margin:10px 0 30px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:15px;
+  outline:none;
+}
+.search-box:focus{border-color:var(--secondary)}
+
+.event-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:22px;
+}
 
 .event-card{
-  border:1px solid #ddd;
-  border-radius:12px;
-  padding:20px;
-  margin-bottom:20px;
-  background:#fafafa;
+  background:linear-gradient(180deg,#ffffff,#faf5fb);
+  border:1px solid #e0d7e6;
+  border-radius:18px;
+  padding:22px;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
+  transition:transform .2s, box-shadow .2s;
+}
+.event-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 14px 30px rgba(0,0,0,.12);
 }
 
 .event-title{
   font-size:18px;
-  font-weight:bold;
+  font-weight:700;
   color:var(--primary);
-  margin-bottom:10px;
+  margin-bottom:14px;
 }
 
-.result-line{
-  padding:6px 0;
-  border-bottom:1px dashed #ccc;
+.result-row{
+  display:flex;
+  align-items:center;
+  padding:8px 0;
+  border-bottom:1px dashed #d6cfe0;
+}
+.result-row:last-child{border-bottom:none}
+
+.medal{
+  min-width:58px;
+  text-align:center;
+  font-weight:bold;
+  font-size:13px;
+  padding:5px 10px;
+  border-radius:14px;
+}
+.medal.gold{background:linear-gradient(90deg,#ffd700,#ffecb3);color:#5d4037}
+.medal.silver{background:#e0e0e0;color:#424242}
+.medal.bronze{background:#f3d0b0;color:#5d4037}
+
+.result-details{
+  margin-left:10px;
+  font-size:14px;
+}
+.result-details b{color:#000}
+
+footer{
+  background:linear-gradient(135deg,#2c0a2f,var(--primary));
+  color:white;
+  text-align:center;
+  padding:20px;
+  margin-top:50px;
+  border-radius:0 0 20px 20px;
+  font-size:13px;
 }
 
-.result-line:last-child{border-bottom:none}
-
-.badge{font-weight:bold;padding:4px 10px;border-radius:12px;font-size:13px}
-.gold{background:#ffd700;color:#5d4037}
-.silver{background:#e0e0e0;color:#424242}
-.bronze{background:#f3d0b0;color:#5d4037}
-
-footer{background:linear-gradient(135deg,#2c0a2f,var(--primary));color:white;text-align:center;padding:18px;margin-top:50px;border-radius:0 0 18px 18px;font-size:13px}
+@media(max-width:768px){
+  header h1{font-size:30px}
+}
 </style>
 </head>
-
 <body>
 
 <header>
@@ -59,12 +133,12 @@ footer{background:linear-gradient(135deg,#2c0a2f,var(--primary));color:white;tex
 
 <div class="container">
 
-<h2>🎭 Event Results</h2>
+<h2>🎭 Event-wise Results</h2>
 <input type="text" id="search" class="search-box"
  placeholder="Search by event, participant, group, department"
  onkeyup="filterResults()">
 
-<div id="eventResults"></div>
+<div id="eventResults" class="event-grid"></div>
 
 <footer>
 © NATTYA 2026 – College Youth Festival<br>
@@ -83,9 +157,7 @@ data.forEach(d=>{
   eventsMap[d.event][d.position] = d;
 });
 
-// Order positions
 const posOrder = ["First","Second","Third"];
-
 let container = document.getElementById("eventResults");
 
 Object.keys(eventsMap).sort().forEach(eventName=>{
@@ -100,18 +172,21 @@ Object.keys(eventsMap).sort().forEach(eventName=>{
   posOrder.forEach(pos=>{
     let r = eventsMap[eventName][pos];
     if(r){
-      let line = document.createElement("div");
-      line.className = "result-line";
+      let row = document.createElement("div");
+      row.className = "result-row";
 
-      let badgeClass = pos==="First"?"gold":pos==="Second"?"silver":"bronze";
+      let medal = document.createElement("div");
+      medal.className = "medal " + (pos === "First" ? "gold" : pos === "Second" ? "silver" : "bronze");
+      medal.innerText = pos;
 
-      line.innerHTML = `
-        <span class="badge ${badgeClass}">${pos}</span>
-        &nbsp; ${r.participant || "-"}
-        &nbsp; <b>(${r.group})</b>
-        &nbsp; – ${r.department || ""}
-      `;
-      card.appendChild(line);
+      let details = document.createElement("div");
+      details.className = "result-details";
+      details.innerHTML = `<b>${r.participant || '-'}</b> (${r.group})<br>
+                           <small>${r.department || ''} • ${r.year || ''}</small>`;
+
+      row.appendChild(medal);
+      row.appendChild(details);
+      card.appendChild(row);
     }
   });
 
@@ -119,10 +194,9 @@ Object.keys(eventsMap).sort().forEach(eventName=>{
 });
 
 function filterResults(){
-  let q = search.value.toLowerCase();
-  [...document.querySelectorAll(".event-card")].forEach(card=>{
-    card.style.display =
-      card.innerText.toLowerCase().includes(q) ? "" : "none";
+  let q = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.event-card').forEach(card=>{
+    card.style.display = card.innerText.toLowerCase().includes(q) ? '' : 'none';
   });
 }
 </script>
