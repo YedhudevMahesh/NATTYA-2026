@@ -59,7 +59,7 @@ label{
   font-weight:bold;
 }
 
-input, select{
+input, select, textarea{
   width:100%;
   padding:10px;
   margin-top:6px;
@@ -111,19 +111,27 @@ button:hover{
 
   <div id="panel" class="hidden">
 
-    <h2>Add Result</h2>
+    <h2>Add / Update Event Result</h2>
 
     <label>Event</label>
-    <select id="event"></select>
+    <select id="eventSelect"></select>
 
     <label>Category</label>
-    <select id="category">
+    <select id="category" onchange="toggleGroupParticipants()">
       <option>Individual</option>
       <option>Group</option>
     </select>
 
-    <label>Participant Name</label>
-    <input id="participant" placeholder="Participant name">
+    <div id="individualFields">
+      <label>Participant Name</label>
+      <input id="participant" placeholder="Participant name">
+    </div>
+
+    <div id="groupFields" class="hidden">
+      <label>Group Participants (one per line)</label>
+      <textarea id="groupParticipants" rows="4"
+        placeholder="Participant 1&#10;Participant 2&#10;Participant 3"></textarea>
+    </div>
 
     <label>Department</label>
     <input id="department" placeholder="Department">
@@ -150,12 +158,13 @@ button:hover{
       <option>Third</option>
     </select>
 
-    <button onclick="addResult()">Save Result</button>
+    <button onclick="saveResult()">Save Result</button>
 
     <div class="note">
-      • Participant details are required for Individual items<br>
-      • Points are calculated automatically<br>
-      • Results update instantly in public page
+      • Each event has only one 1st, 2nd and 3rd result<br>
+      • Saving again for same event & position will update it<br>
+      • For Group items, add all participants (one per line)<br>
+      • Points are calculated automatically
     </div>
 
   </div>
@@ -263,7 +272,7 @@ const points = {
   Group: { First: 10, Second: 6, Third: 2 }
 };
 
-const eventSelect = document.getElementById("event");
+const eventSelect = document.getElementById("eventSelect");
 events.forEach(e => {
   let opt = document.createElement("option");
   opt.text = e;
@@ -278,29 +287,6 @@ function login(){
   }
 }
 
-function addResult(){
-  let data = JSON.parse(localStorage.getItem("nattya") || "[]");
-
-  let obj = {
-    event: event.value,
-    participant: participant.value,
-    department: department.value,
-    year: year.value,
-    group: group.value,
-    category: category.value,
-    position: position.value,
-    points: points[category.value][position.value]
-  };
-
-  data.push(obj);
-  localStorage.setItem("nattya", JSON.stringify(data));
-
-  alert("Result saved successfully");
-
-  participant.value = "";
-  department.value = "";
-}
-</script>
-
-</body>
-</html>
+function toggleGroupParticipants(){
+  const isGroup = document.getElementById("category").value === "Grou
+    
