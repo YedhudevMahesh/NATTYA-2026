@@ -161,75 +161,81 @@ Official Results Portal
 </div>
 
 <script>
-let data = JSON.parse(localStorage.getItem('nattya') || '[]');
-
-// Group results by event
-let eventsMap = {};
-data.forEach(d=>{
-  if(!eventsMap[d.event]) eventsMap[d.event] = {};
-  eventsMap[d.event][d.position] = d;
-});
-
-// Totals
-let totalsObj = {Mudhra:0, Lasya:0, Kavya:0};
-
-const posOrder = ["First","Second","Third"];
-let container = document.getElementById("eventResults");
-
-Object.keys(eventsMap).sort().forEach(eventName=>{
-  let card = document.createElement("div");
-  card.className = "event-card";
-
-  let title = document.createElement("div");
-  title.className = "event-title";
-  title.innerText = eventName;
-  card.appendChild(title);
-
-  posOrder.forEach(pos=>{
-    let r = eventsMap[eventName][pos];
-    if(r){
-      let line = document.createElement("div");
-      line.className = "result-line";
-
-      let badge = document.createElement("span");
-      badge.className = "badge " +
-        (pos === "First" ? "gold" :
-         pos === "Second" ? "silver" : "bronze");
-      badge.innerText = pos;
-
-      let detail = document.createElement("div");
-      detail.className = "details";
-      detail.innerHTML =
-        `<b>${r.participant || '-'}</b> (${r.group})<br>
-         <small>${r.department || ''} • ${r.year || ''}</small>`;
-
-      let pts = document.createElement("div");
-      pts.className = "points";
-      pts.innerText = r.points + " pts";
-
-      line.appendChild(badge);
-      line.appendChild(detail);
-      line.appendChild(pts);
-      card.appendChild(line);
-
-      totalsObj[r.group] += r.points || 0;
-    }
+fetch("results.json")
+  .then(res => res.json())
+  .then(data => buildPage(data))
+  .catch(() => {
+    document.getElementById("eventResults").innerHTML =
+      "<b>No results published yet.</b><br>Admin must upload results.json";
   });
 
-  container.appendChild(card);
-});
+function buildPage(data){
 
-let totalsArr = Object.entries(totalsObj)
-  .map(([group,points])=>({group,points}))
-  .sort((a,b)=>b.points - a.points);
+  let eventsMap = {};
+  data.forEach(d=>{
+    if(!eventsMap[d.event]) eventsMap[d.event] = {};
+    eventsMap[d.event][d.position] = d;
+  });
 
-let totals = document.getElementById('totals');
-totalsArr.forEach((g,i)=>{
-  let r = totals.insertRow();
-  r.insertCell(0).innerText = i + 1;
-  r.insertCell(1).innerText = g.group;
-  r.insertCell(2).innerText = g.points;
-});
+  let totalsObj = {Mudhra:0, Lasya:0, Kavya:0};
+  const posOrder = ["First","Second","Third"];
+  let container = document.getElementById("eventResults");
+
+  Object.keys(eventsMap).sort().forEach(eventName=>{
+    let card = document.createElement("div");
+    card.className = "event-card";
+
+    let title = document.createElement("div");
+    title.className = "event-title";
+    title.innerText = eventName;
+    card.appendChild(title);
+
+    posOrder.forEach(pos=>{
+      let r = eventsMap[eventName][pos];
+      if(r){
+        let line = document.createElement("div");
+        line.className = "result-line";
+
+        let badge = document.createElement("span");
+        badge.className = "badge " +
+          (pos === "First" ? "gold" :
+           pos === "Second" ? "silver" : "bronze");
+        badge.innerText = pos;
+
+        let detail = document.createElement("div");
+        detail.className = "details";
+        detail.innerHTML =
+          `<b>${r.participant || '-'}</b> (${r.group})<br>
+           <small>${r.department || ''} • ${r.year || ''}</small>`;
+
+        let pts = document.createElement("div");
+        pts.className = "points";
+        pts.innerText = r.points + " pts";
+
+        line.appendChild(badge);
+        line.appendChild(detail);
+        line.appendChild(pts);
+        card.appendChild(line);
+
+        totalsObj[r.group] += r.points || 0;
+      }
+    });
+
+    container.appendChild(card);
+  });
+
+  let totalsArr = Object.entries(totalsObj)
+    .map(([group,points])=>({group,points}))
+    .sort((a,b)=>b.points - a.points);
+
+  let totals = document.getElementById('totals');
+  totalsArr.forEach((g,i)=>{
+    let r = totals.insertRow();
+    r.insertCell(0).innerText = i + 1;
+    r.insertCell(1).innerText = g.group;
+    r.insertCell(2).innerText = g.points;
+  });
+}
 
 function filterResults(){
   let q = document.getElementById('search').value.toLowerCase();
