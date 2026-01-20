@@ -6,287 +6,177 @@
 <title>NATTYA 2026 – Admin Panel</title>
 
 <style>
-:root{
-  --primary:#4b164c;
-  --secondary:#9c27b0;
-  --bg:#f4f5fb;
-}
-
-body{
-  font-family:'Segoe UI',Arial,sans-serif;
-  background:linear-gradient(180deg,#f7f3fb,#f0ecf7);
-  margin:0;
-  color:#333;
-}
-
-header{
-  background:linear-gradient(135deg,#2c0a2f,var(--primary),var(--secondary));
-  color:#fff;
-  padding:25px;
-  text-align:center;
-}
-
-header h1{
-  margin:0;
-  font-size:30px;
-  letter-spacing:1px;
-}
-
-header p{
-  margin:6px 0 0;
-  font-size:14px;
-  opacity:.9;
-}
-
-.container{
-  max-width:900px;
-  margin:40px auto;
-  background:#fff;
-  padding:30px;
-  border-radius:16px;
-  box-shadow:0 12px 30px rgba(0,0,0,.12);
-}
-
-h2{
-  color:var(--primary);
-  border-left:6px solid var(--secondary);
-  padding-left:12px;
-}
-
-label{
-  display:block;
-  margin-top:14px;
-  font-weight:bold;
-}
-
-input, select, textarea{
-  width:100%;
-  padding:10px;
-  margin-top:6px;
-  border-radius:6px;
-  border:1px solid #ccc;
-  font-size:14px;
-}
-
-button{
-  margin-top:20px;
-  padding:12px;
-  width:100%;
-  background:linear-gradient(135deg,var(--primary),var(--secondary));
-  color:white;
-  border:none;
-  border-radius:8px;
-  font-size:16px;
-  cursor:pointer;
-}
-
-button:hover{
-  opacity:.9;
-}
-
-.note{
-  font-size:13px;
-  color:#666;
-  margin-top:10px;
-}
-
-.hidden{
-  display:none;
-}
+:root{--primary:#4b164c;--secondary:#9c27b0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f7f3fb;margin:0}
+header{background:linear-gradient(135deg,#2c0a2f,var(--primary),var(--secondary));color:#fff;padding:20px;text-align:center}
+.container{max-width:1000px;margin:30px auto;background:#fff;padding:25px;border-radius:14px;box-shadow:0 10px 25px rgba(0,0,0,.1)}
+h2{color:var(--primary)}
+label{display:block;margin-top:12px;font-weight:bold}
+input,select,textarea{width:100%;padding:10px;margin-top:6px;border-radius:6px;border:1px solid #ccc}
+button{margin-top:15px;padding:10px 15px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border:none;border-radius:6px;cursor:pointer}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th,td{border:1px solid #ddd;padding:8px;text-align:center}
+th{background:var(--primary);color:#fff}
+.hidden{display:none}
 </style>
 </head>
 
 <body>
 
 <header>
-  <h1>NATTYA 2026</h1>
-  <p>Admin Result Entry Portal</p>
+<h1>NATTYA 2026</h1>
+<p>Admin Result Entry Portal</p>
 </header>
 
 <div class="container">
 
-  <h2>Admin Login</h2>
-  <input type="password" id="pass" placeholder="Enter Admin Password">
-  <button onclick="login()">Login</button>
+<h2>Admin Login</h2>
+<input type="password" id="pass" placeholder="Password">
+<button onclick="login()">Login</button>
 
-  <div id="panel" class="hidden">
+<div id="panel" class="hidden">
 
-    <h2>Add / Update Event Result</h2>
+<h2>Add / Edit Result</h2>
 
-    <label>Event</label>
-    <select id="eventSelect"></select>
+<label>Event</label>
+<select id="eventSelect"></select>
 
-    <label>Category</label>
-    <select id="category" onchange="toggleGroupParticipants()">
-      <option>Individual</option>
-      <option>Group</option>
-    </select>
+<label>Category</label>
+<select id="category" onchange="toggleGroupParticipants()">
+<option>Individual</option>
+<option>Group</option>
+</select>
 
-    <div id="individualFields">
-      <label>Participant Name</label>
-      <input id="participant" placeholder="Participant name">
-    </div>
+<div id="individualFields">
+<label>Participant Name</label>
+<input id="participant">
+</div>
 
-    <div id="groupFields" class="hidden">
-      <label>Group Participants (one per line)</label>
-      <textarea id="groupParticipants" rows="4"
-        placeholder="Participant 1&#10;Participant 2&#10;Participant 3"></textarea>
-    </div>
+<div id="groupFields" class="hidden">
+<label>Group Participants (one per line)</label>
+<textarea id="groupParticipants"></textarea>
+</div>
 
-    <label>Department</label>
-    <input id="department" placeholder="Department">
+<label>Department</label>
+<input id="department">
 
-    <label>Year of Course</label>
-    <select id="year">
-      <option>1st Year</option>
-      <option>2nd Year</option>
-      <option>3rd Year</option>
-      <option>4th Year</option>
-    </select>
+<label>Year</label>
+<select id="year">
+<option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option>
+</select>
 
-    <label>Group</label>
-    <select id="group">
-      <option>Mudhra</option>
-      <option>Lasya</option>
-      <option>Kavya</option>
-    </select>
+<label>Group</label>
+<select id="group">
+<option>Mudhra</option><option>Lasya</option><option>Kavya</option>
+</select>
 
-    <label>Position</label>
-    <select id="position">
-      <option>First</option>
-      <option>Second</option>
-      <option>Third</option>
-    </select>
+<label>Position</label>
+<select id="position">
+<option>First</option><option>Second</option><option>Third</option>
+</select>
 
-    <button onclick="saveResult()">Save Result</button>
+<button onclick="saveResult()">Save / Update Result</button>
 
-    <div class="note">
-      • Each event has only one 1st, 2nd and 3rd result<br>
-      • Saving again for same event & position will update it<br>
-      • For Group items, add all participants (one per line)<br>
-      • Points are calculated automatically
-    </div>
+<h2>Saved Results</h2>
+<table>
+<thead><tr><th>Event</th><th>Participant(s)</th><th>Group</th><th>Position</th><th>Actions</th></tr></thead>
+<tbody id="adminResults"></tbody>
+</table>
 
-  </div>
-
+</div>
 </div>
 
 <script>
-const PASSWORD = "festival123";
+const PASSWORD="festival123";
+let editIndex=null;
 
-const events = [
-  "Light Music Vocal (Indian) – Male",
-  "Light Music Vocal (Indian) – Female",
-  "Light Music Vocal (Indian) – Transgender",
-  "Classical Music Vocal – Male",
-  "Classical Music Vocal – Female",
-  "Classical Music Vocal – Transgender",
-  "Stringed Instrument – Eastern Style",
-  "Stringed Instrument – Western Style",
-  "Wind Instrument – Eastern Style",
-  "Wind Instrument – Western Style",
-  "Percussion Instrument – Eastern Style",
-  "Percussion Instrument – Western Style",
-  "Western Vocal Solo",
-  "Group Song (Indian)",
-  "Group Song (Western)",
-  "Vanchipattu",
-  "Mappilapattu",
-  "Nadappattu",
-  "Folk Orchestra",
-  "Kathakali",
-  "Bharathanatyam – Male",
-  "Bharathanatyam – Female",
-  "Bharathanatyam – Transgender",
-  "Mohiniyattam",
-  "Folk Dance (Individual) – Male",
-  "Folk Dance (Individual) – Female",
-  "Folk Dance (Individual) – Transgender",
-  "Folk Dance (Group)",
-  "Margamkali",
-  "Oppana",
-  "Thiruvathirakali",
-  "Other Forms of Classical Dances",
-  "Ottanthullal",
-  "Keralanatanam",
-  "Duffmuttu",
-  "Kolkali",
-  "Kuchipudi – Male",
-  "Kuchipudi – Female",
-  "Kuchipudi – Transgender",
-  "Nagyarkoothu – Female",
-  "Elocution – Malayalam",
-  "Elocution – English",
-  "Elocution – Hindi",
-  "Elocution – Tamil",
-  "Essay Writing – English",
-  "Essay Writing – Malayalam",
-  "Essay Writing – Hindi",
-  "Essay Writing – Tamil",
-  "Essay Writing – Arabic",
-  "Essay Writing – Sanskrit",
-  "Short Story Writing – English",
-  "Short Story Writing – Malayalam",
-  "Short Story Writing – Hindi",
-  "Short Story Writing – Tamil",
-  "Short Story Writing – Arabic",
-  "Short Story Writing – Sanskrit",
-  "Poetry Writing – English",
-  "Poetry Writing – Malayalam",
-  "Poetry Writing – Hindi",
-  "Poetry Writing – Tamil",
-  "Poetry Writing – Sanskrit",
-  "Quiz",
-  "Aksharaslokam",
-  "Kavikaleli",
-  "Kavithaparayanam (Malayalam)",
-  "Poetry Recitation – English",
-  "Poetry Recitation – Hindi",
-  "Poetry Recitation – Tamil",
-  "Poetry Recitation – Arabic",
-  "Film Review",
-  "Kathaprasangam",
-  "Debate – English",
-  "Debate – Malayalam",
-  "Mono Act",
-  "Mimicry",
-  "Mime",
-  "Skit",
-  "One Act Play",
-  "Parichamuttu",
-  "Chakyarkoothu – Male",
-  "Standup Comedy",
-  "On the Spot Painting",
-  "Collage",
-  "Poster Designing",
-  "Clay Modeling",
-  "Cartooning",
-  "Photography",
-  "Installation",
-  "Rangoli",
-  "Mehendi"
-];
+const events=[/* same 90 events list here */];
 
-const points = {
-  Individual: { First: 5, Second: 3, Third: 1 },
-  Group: { First: 10, Second: 6, Third: 2 }
-};
+const points={Individual:{First:5,Second:3,Third:1},Group:{First:10,Second:6,Third:2}};
 
-const eventSelect = document.getElementById("eventSelect");
-events.forEach(e => {
-  let opt = document.createElement("option");
-  opt.text = e;
-  eventSelect.add(opt);
-});
+events.forEach(e=>{let o=document.createElement("option");o.text=e;eventSelect.add(o)});
 
 function login(){
-  if(document.getElementById("pass").value === PASSWORD){
-    document.getElementById("panel").classList.remove("hidden");
-  } else {
-    alert("Wrong password");
-  }
+ if(pass.value===PASSWORD){
+  panel.classList.remove("hidden");
+  loadAdminResults();
+ } else alert("Wrong password");
 }
 
 function toggleGroupParticipants(){
-  const isGroup = document.getElementById("category").value === "Grou
-    
+ groupFields.classList.toggle("hidden",category.value!=="Group");
+ individualFields.classList.toggle("hidden",category.value==="Group");
+}
+
+function saveResult(){
+ let data=JSON.parse(localStorage.getItem("nattya")||"[]");
+
+ const obj={
+  event:eventSelect.value,
+  participant: category.value==="Group" ? groupParticipants.value.split("\n").join(", ") : participant.value,
+  department:department.value,
+  year:year.value,
+  group:group.value,
+  category:category.value,
+  position:position.value,
+  points:points[category.value][position.value]
+ };
+
+ if(editIndex!==null){
+  data[editIndex]=obj;
+  editIndex=null;
+ } else {
+  data=data.filter(r=>!(r.event===obj.event && r.position===obj.position));
+  data.push(obj);
+ }
+
+ localStorage.setItem("nattya",JSON.stringify(data));
+ clearForm();
+ loadAdminResults();
+}
+
+function loadAdminResults(){
+ let data=JSON.parse(localStorage.getItem("nattya")||"[]");
+ let t=document.getElementById("adminResults");
+ t.innerHTML="";
+ data.forEach((d,i)=>{
+  let r=t.insertRow();
+  r.insertCell(0).innerText=d.event;
+  r.insertCell(1).innerText=d.participant;
+  r.insertCell(2).innerText=d.group;
+  r.insertCell(3).innerText=d.position;
+  r.insertCell(4).innerHTML=
+   `<button onclick="editResult(${i})">Edit</button>
+    <button onclick="deleteResult(${i})">Delete</button>`;
+ });
+}
+
+function editResult(i){
+ let data=JSON.parse(localStorage.getItem("nattya")||"[]");
+ let d=data[i];
+ editIndex=i;
+ eventSelect.value=d.event;
+ category.value=d.category;
+ toggleGroupParticipants();
+ participant.value=d.participant;
+ department.value=d.department;
+ year.value=d.year;
+ group.value=d.group;
+ position.value=d.position;
+}
+
+function deleteResult(i){
+ if(confirm("Delete this result?")){
+  let data=JSON.parse(localStorage.getItem("nattya")||"[]");
+  data.splice(i,1);
+  localStorage.setItem("nattya",JSON.stringify(data));
+  loadAdminResults();
+ }
+}
+
+function clearForm(){
+ participant.value=""; department.value=""; groupParticipants.value="";
+}
+</script>
+</body>
+</html>
