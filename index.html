@@ -5,78 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NATTYA 2026 – Results</title>
 <style>
-:root{
-  --primary:#4b164c;
-  --secondary:#9c27b0;
-  --gold:#d4af37;
-  --silver:#c0c0c0;
-  --bronze:#cd7f32;
-  --bg:#f4f5fb;
-}
-body{
-  font-family:'Segoe UI',Arial,sans-serif;
-  background:linear-gradient(180deg,#f7f3fb,#f0ecf7);
-  margin:0;color:#333
-}
-header{
-  background:linear-gradient(135deg,#2c0a2f,var(--primary),var(--secondary));
-  color:#fff;padding:35px;text-align:center;position:relative
-}
+:root{--primary:#4b164c;--secondary:#9c27b0;--gold:#d4af37;--silver:#c0c0c0;--bronze:#cd7f32}
+body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(180deg,#f7f3fb,#f0ecf7);margin:0;color:#333}
+header{background:linear-gradient(135deg,#2c0a2f,var(--primary),var(--secondary));color:#fff;padding:35px;text-align:center}
 header img{height:90px;margin-bottom:10px}
 header h1{margin:0;font-size:36px;letter-spacing:2px}
 header p{margin:6px 0 0;font-size:15px;opacity:.9}
-.ribbon{
-  position:absolute;bottom:-15px;left:50%;transform:translateX(-50%);
-  background:linear-gradient(90deg,#ffd700,#ffecb3,#ffd700);
-  color:#5d4037;padding:6px 20px;border-radius:20px;
-  font-weight:bold;font-size:13px;box-shadow:0 4px 10px rgba(0,0,0,.2)
-}
-.container{
-  max-width:1200px;margin:50px auto;background:#fff;padding:35px;
-  border-radius:18px;box-shadow:0 15px 35px rgba(0,0,0,.12)
-}
-h2{
-  margin-top:10px;color:var(--primary);
-  border-left:6px solid var(--secondary);
-  padding-left:12px;font-size:22px
-}
-
+.container{max-width:1200px;margin:50px auto;background:#fff;padding:35px;border-radius:18px;box-shadow:0 15px 35px rgba(0,0,0,.12)}
+h2{margin-top:10px;color:var(--primary);border-left:6px solid var(--secondary);padding-left:12px;font-size:22px}
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:separate;border-spacing:0;margin-top:20px;font-size:14px}
 th,td{padding:12px;text-align:center}
-th{
-  background:linear-gradient(90deg,var(--primary),var(--secondary));
-  color:#fff;position:sticky;top:0
-}
+th{background:linear-gradient(90deg,var(--primary),var(--secondary));color:#fff;position:sticky;top:0}
 tr:nth-child(even){background:#fafafa}
 tr:hover{background:#f3e5f5}
-
-#totals tr:nth-child(1){
-  background:linear-gradient(90deg,#fff8e1,#ffe0b2);
-  font-weight:bold;border-left:6px solid var(--gold)
-}
+#totals tr:nth-child(1){background:linear-gradient(90deg,#fff8e1,#ffe0b2);font-weight:bold;border-left:6px solid var(--gold)}
 #totals tr:nth-child(1) td{color:#bf360c}
 #totals tr:nth-child(2){border-left:6px solid var(--silver)}
 #totals tr:nth-child(3){border-left:6px solid var(--bronze)}
-
-.badge{
-  display:inline-block;padding:4px 10px;border-radius:14px;
-  font-size:12px;font-weight:bold
-}
+.badge{display:inline-block;padding:4px 10px;border-radius:14px;font-size:12px;font-weight:bold}
 .badge.gold{background:linear-gradient(90deg,#ffd700,#ffecb3);color:#5d4037}
 .badge.silver{background:#e0e0e0;color:#424242}
 .badge.bronze{background:#f3d0b0;color:#5d4037}
-
-footer{
-  background:linear-gradient(135deg,#2c0a2f,var(--primary));
-  color:white;text-align:center;padding:18px;margin-top:50px;
-  border-radius:0 0 18px 18px;font-size:13px
-}
-
-@media(max-width:768px){
-  table{font-size:12px}
-  header h1{font-size:28px}
-}
+footer{background:linear-gradient(135deg,#2c0a2f,var(--primary));color:white;text-align:center;padding:18px;margin-top:50px;border-radius:0 0 18px 18px;font-size:13px}
 </style>
 </head>
 <body>
@@ -84,7 +35,6 @@ footer{
   <img src="logo.png">
   <h1>NATTYA 2026</h1>
   <p>College Youth Festival – Official Results</p>
-  <div class="ribbon">🏆 Championship Tracker</div>
 </header>
 
 <div class="container">
@@ -92,7 +42,7 @@ footer{
 <h2>🎭 Event Results</h2>
 <div class="table-wrap">
 <table>
-<thead><tr><th>Event</th><th>Participant</th><th>Department</th><th>Year</th><th>Group</th><th>Position</th><th>Points</th></tr></thead>
+<thead><tr><th>Event</th><th>Participant(s)</th><th>Department</th><th>Year</th><th>Group</th><th>Position</th><th>Points</th></tr></thead>
 <tbody id="results"></tbody>
 </table>
 </div>
@@ -113,36 +63,40 @@ Official Results Portal
 </div>
 
 <script>
-let data=JSON.parse(localStorage.getItem('nattya')||'[]');
-let res=document.getElementById('results');
-let totalsObj={Mudhra:0,Lasya:0,Kavya:0};
+let data = JSON.parse(localStorage.getItem('nattya') || '[]');
+let res = document.getElementById('results');
+let totalsObj = {Mudhra:0, Lasya:0, Kavya:0};
+
+// Sort results by event then position order
+const posOrder = {First:1, Second:2, Third:3};
+data.sort((a,b)=> a.event.localeCompare(b.event) || posOrder[a.position]-posOrder[b.position]);
 
 data.forEach(d=>{
-  let r=res.insertRow();
-  r.insertCell(0).innerText=d.event;
-  r.insertCell(1).innerText=d.participant||'-';
-  r.insertCell(2).innerText=d.department||'-';
-  r.insertCell(3).innerText=d.year||'-';
-  r.insertCell(4).innerText=d.group;
-  r.insertCell(5).innerText=d.position;
-  r.insertCell(6).innerText=d.points;
-  totalsObj[d.group]+=d.points;
+  let r = res.insertRow();
+  r.insertCell(0).innerText = d.event || '-';
+  r.insertCell(1).innerText = d.participant || '-';
+  r.insertCell(2).innerText = d.department || '-';
+  r.insertCell(3).innerText = d.year || '-';
+  r.insertCell(4).innerText = d.group || '-';
+  r.insertCell(5).innerText = d.position || '-';
+  r.insertCell(6).innerText = d.points || 0;
+  totalsObj[d.group] += d.points || 0;
 });
 
-let totalsArr=Object.entries(totalsObj)
+let totalsArr = Object.entries(totalsObj)
   .map(([group,points])=>({group,points}))
   .sort((a,b)=>b.points-a.points);
 
-let totals=document.getElementById('totals');
+let totals = document.getElementById('totals');
 totalsArr.forEach((g,i)=>{
-  let r=totals.insertRow();
-  r.insertCell(0).innerText=i+1;
-  r.insertCell(1).innerText=g.group;
-  r.insertCell(2).innerText=g.points;
-  let status=r.insertCell(3);
-  if(i===0) status.innerHTML='<span class="badge gold">Champion</span>';
-  else if(i===1) status.innerHTML='<span class="badge silver">Runner‑up</span>';
-  else if(i===2) status.innerHTML='<span class="badge bronze">2nd Runner‑up</span>';
+  let r = totals.insertRow();
+  r.insertCell(0).innerText = i+1;
+  r.insertCell(1).innerText = g.group;
+  r.insertCell(2).innerText = g.points;
+  let status = r.insertCell(3);
+  if(i===0) status.innerHTML = '<span class="badge gold">Champion</span>';
+  else if(i===1) status.innerHTML = '<span class="badge silver">Runner-up</span>';
+  else if(i===2) status.innerHTML = '<span class="badge bronze">2nd Runner-up</span>';
 });
 </script>
 
