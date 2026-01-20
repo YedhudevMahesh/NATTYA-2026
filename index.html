@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NATTYA 2026 – Results</title>
+<style>
+:root{
+  --primary:#4b164c;
+  --secondary:#7b1fa2;
+  --accent:#f3e5f5;
+  --bg:#f6f7fb;
+}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);margin:0;color:#333}
+header{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:25px;text-align:center}
+header h1{margin:0;font-size:32px;letter-spacing:1px}
+header p{margin:5px 0 0;font-size:15px;opacity:.9}
+.container{max-width:1150px;margin:30px auto;background:#fff;padding:30px;border-radius:14px;box-shadow:0 10px 25px rgba(0,0,0,.08)}
+h2{margin-top:10px;color:var(--primary);border-left:5px solid var(--secondary);padding-left:10px}
+
+table{width:100%;border-collapse:separate;border-spacing:0;margin-top:20px;font-size:14px}
+th,td{padding:10px;text-align:center}
+th{background:var(--primary);color:#fff}
+tr:nth-child(even){background:#fafafa}
+tr:hover{background:var(--accent)}
+
+/* Ranking styles */
+#totals tr:nth-child(1){background:#fff8e1;font-weight:bold}
+#totals tr:nth-child(1) td{color:#e65100}
+#totals tr:nth-child(2){background:#f5f5f5}
+#totals tr:nth-child(3){background:#fdf6f0}
+
+@media(max-width:768px){
+  table{font-size:12px}
+  header h1{font-size:26px}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>NATTYA 2026</h1>
+<p>Official Results</p>
+</header>
+<div class="container">
+<h2>Event Results</h2>
+<table>
+<thead><tr><th>Event</th><th>Participant</th><th>Department</th><th>Year</th><th>Group</th><th>Position</th><th>Points</th></tr></thead>
+<tbody id="results"></tbody>
+</table>
+<h2>Total Points & Ranking</h2>
+<table>
+<thead><tr><th>Rank</th><th>Group</th><th>Total Points</th></tr></thead>
+<tbody id="totals"></tbody>
+</table>
+</div>
+<script>
+let data=JSON.parse(localStorage.getItem('nattya')||'[]');
+let res=document.getElementById('results');
+let totalsObj={Mudhra:0,Lasya:0,Kavya:0};
+
+data.forEach(d=>{
+  let r=res.insertRow();
+  r.insertCell(0).innerText=d.event;
+  r.insertCell(1).innerText=d.participant;
+  r.insertCell(2).innerText=d.department;
+  r.insertCell(3).innerText=d.year;
+  r.insertCell(4).innerText=d.group;
+  r.insertCell(5).innerText=d.position;
+  r.insertCell(6).innerText=d.points;
+  totalsObj[d.group]+=d.points;
+});
+
+let totalsArr=Object.entries(totalsObj)
+  .map(([group,points])=>({group,points}))
+  .sort((a,b)=>b.points-a.points);
+
+let totals=document.getElementById('totals');
+totalsArr.forEach((g,i)=>{
+  let r=totals.insertRow();
+  r.insertCell(0).innerText=i+1;
+  r.insertCell(1).innerText=g.group;
+  r.insertCell(2).innerText=g.points;
+});
+</script>
+</body>
+</html>
