@@ -25,17 +25,8 @@ header{
   text-align:center;
 }
 
-header h1{
-  margin:0;
-  font-size:30px;
-  letter-spacing:1px;
-}
-
-header p{
-  margin:6px 0 0;
-  font-size:14px;
-  opacity:.9;
-}
+header h1{margin:0;font-size:30px;letter-spacing:1px}
+header p{margin:6px 0 0;font-size:14px;opacity:.9}
 
 .container{
   max-width:1000px;
@@ -46,17 +37,9 @@ header p{
   box-shadow:0 12px 30px rgba(0,0,0,.12);
 }
 
-h2{
-  color:var(--primary);
-  border-left:6px solid var(--secondary);
-  padding-left:12px;
-}
+h2{color:var(--primary);border-left:6px solid var(--secondary);padding-left:12px}
 
-label{
-  display:block;
-  margin-top:14px;
-  font-weight:bold;
-}
+label{display:block;margin-top:14px;font-weight:bold}
 
 input, select, textarea{
   width:100%;
@@ -78,29 +61,30 @@ button{
   font-size:14px;
 }
 
-button:hover{
-  opacity:.9;
+button:hover{opacity:.9}
+
+.secondary-btn{
+  background:linear-gradient(135deg,#607d8b,#455a64);
 }
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:20px;
+.danger-btn{
+  background:linear-gradient(135deg,#d32f2f,#b71c1c);
 }
 
-th, td{
-  border:1px solid #ddd;
-  padding:8px;
-  text-align:center;
-}
-
-th{
-  background:var(--primary);
-  color:#fff;
-}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th, td{border:1px solid #ddd;padding:8px;text-align:center}
+th{background:var(--primary);color:#fff}
 
 .hidden{display:none}
 .actions button{margin:2px;font-size:12px}
+
+.sync-box{
+  margin-top:20px;
+  padding:15px;
+  background:#f7f3fb;
+  border:1px dashed var(--secondary);
+  border-radius:10px;
+}
 </style>
 </head>
 
@@ -169,6 +153,15 @@ th{
 
     <button onclick="saveResult()">Save / Update Result</button>
 
+    <div class="sync-box">
+      <b>Manual Sync</b><br>
+      After entering results, click below and upload the file to GitHub.
+      <br>
+      <button class="secondary-btn" onclick="downloadResults()">Download results.json</button>
+      <button class="secondary-btn" onclick="importResults()">Import results.json</button>
+      <input type="file" id="fileInput" accept="application/json" class="hidden">
+    </div>
+
     <h2>Saved Results</h2>
     <table>
       <thead>
@@ -182,6 +175,8 @@ th{
       </thead>
       <tbody id="adminResults"></tbody>
     </table>
+
+    <button class="danger-btn" onclick="clearAllResults()">Clear All Results</button>
 
   </div>
 
@@ -221,13 +216,13 @@ const points = {
 
 window.onload = function(){
   const eventSelect = document.getElementById("eventSelect");
-
   events.forEach(e=>{
     let opt = document.createElement("option");
     opt.value = e;
     opt.textContent = e;
     eventSelect.appendChild(opt);
   });
+  loadAdminResults();
 };
 
 function login(){
@@ -246,12 +241,8 @@ function toggleGroupParticipants(){
 }
 
 function saveResult(){
-
   const eventName = eventSelect.value;
-  if(!eventName){
-    alert("Please select an event");
-    return;
-  }
+  if(!eventName){alert("Please select an event");return;}
 
   const categoryVal = category.value;
   const positionVal = position.value;
@@ -267,51 +258,29 @@ function saveResult(){
   }
 
   let data = JSON.parse(localStorage.getItem("nattya") || "[]");
-
   data = data.filter(r => !(r.event === eventName && r.position === positionVal));
 
-  const obj = {
-    event: eventName,
-    participant: participantName,
-    participants: participants,
-    department: department.value,
-    year: year.value,
-    group: groupName,
-    category: categoryVal,
-    position: positionVal,
-    points: pts
-  };
+  const obj = {event:eventName,participant:participantName,participants:participants,department:department.value,year:year.value,group:groupName,category:categoryVal,position:positionVal,points:pts};
 
-  if(editIndex !== null){
-    data[editIndex] = obj;
-    editIndex = null;
-  } else {
-    data.push(obj);
-  }
+  if(editIndex !== null){data[editIndex] = obj;editIndex = null;} else {data.push(obj);}  
 
   localStorage.setItem("nattya", JSON.stringify(data));
-
   clearForm();
   loadAdminResults();
-
   alert("Result saved successfully");
 }
 
 function loadAdminResults(){
   let data = JSON.parse(localStorage.getItem("nattya") || "[]");
   adminResults.innerHTML = "";
-
   data.forEach((d,i)=>{
     let r = adminResults.insertRow();
     r.insertCell(0).innerText = d.event;
     r.insertCell(1).innerText = d.participant;
     r.insertCell(2).innerText = d.group;
     r.insertCell(3).innerText = d.position;
-
     let act = r.insertCell(4);
-    act.innerHTML =
-      `<button onclick="editResult(${i})">Edit</button>
-       <button onclick="deleteResult(${i})">Delete</button>`;
+    act.innerHTML = `<button onclick="editResult(${i})">Edit</button> <button onclick="deleteResult(${i})">Delete</button>`;
   });
 }
 
@@ -319,7 +288,6 @@ function editResult(i){
   let data = JSON.parse(localStorage.getItem("nattya") || "[]");
   let d = data[i];
   editIndex = i;
-
   eventSelect.value = d.event;
   category.value = d.category;
   toggleGroupParticipants();
@@ -328,9 +296,7 @@ function editResult(i){
   year.value = d.year;
   group.value = d.group;
   position.value = d.position;
-  if(d.category === "Group"){
-    groupParticipants.value = (d.participants || []).join("\n");
-  }
+  if(d.category === "Group"){groupParticipants.value = (d.participants || []).join("\n");}
 }
 
 function deleteResult(i){
@@ -342,10 +308,47 @@ function deleteResult(i){
   }
 }
 
-function clearForm(){
-  participant.value = "";
-  department.value = "";
-  groupParticipants.value = "";
+function clearForm(){participant.value="";department.value="";groupParticipants.value=""}
+
+// -------- Manual Sync --------
+function downloadResults(){
+  let data = localStorage.getItem("nattya") || "[]";
+  let blob = new Blob([data], { type: "application/json" });
+  let url = URL.createObjectURL(blob);
+  let a = document.createElement("a");
+  a.href = url;
+  a.download = "results.json";
+  a.click();
+  URL.revokeObjectURL(url);
+  alert("results.json downloaded. Upload it to GitHub.");
+}
+
+function importResults(){
+  document.getElementById("fileInput").click();
+}
+
+document.getElementById("fileInput").addEventListener("change", function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt){
+    try{
+      let data = JSON.parse(evt.target.result);
+      localStorage.setItem("nattya", JSON.stringify(data));
+      loadAdminResults();
+      alert("Results imported successfully");
+    } catch(err){
+      alert("Invalid results.json file");
+    }
+  };
+  reader.readAsText(file);
+});
+
+function clearAllResults(){
+  if(confirm("This will delete all results locally. Continue?")){
+    localStorage.removeItem("nattya");
+    loadAdminResults();
+  }
 }
 </script>
 
