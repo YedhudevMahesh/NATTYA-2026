@@ -4,47 +4,53 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NATTYA 2026 – Results</title>
+
 <style>
-:root{--primary:#4b164c;--secondary:#9c27b0;--gold:#d4af37;--silver:#c0c0c0;--bronze:#cd7f32}
+:root{--primary:#4b164c;--secondary:#9c27b0}
 body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(180deg,#f7f3fb,#f0ecf7);margin:0;color:#333}
 header{background:linear-gradient(135deg,#2c0a2f,var(--primary),var(--secondary));color:#fff;padding:35px;text-align:center}
 header img{height:90px;margin-bottom:10px}
-header h1{margin:0;font-size:36px;letter-spacing:2px}
+header h1{margin:0;font-size:36px}
 header p{margin:6px 0 0;font-size:15px;opacity:.9}
-.container{max-width:1200px;margin:50px auto;background:#fff;padding:35px;border-radius:18px;box-shadow:0 15px 35px rgba(0,0,0,.12)}
-h2{margin-top:10px;color:var(--primary);border-left:6px solid var(--secondary);padding-left:12px;font-size:22px}
 
-.search-box{
-  width:100%;padding:12px;margin:15px 0 25px 0;border-radius:8px;
-  border:1px solid #ccc;font-size:15px
+.container{max-width:1200px;margin:50px auto;background:#fff;padding:35px;border-radius:18px;box-shadow:0 15px 35px rgba(0,0,0,.12)}
+h2{color:var(--primary);border-left:6px solid var(--secondary);padding-left:12px}
+
+.search-box{width:100%;padding:12px;margin:15px 0 25px;border-radius:8px;border:1px solid #ccc;font-size:15px}
+
+.event-card{
+  border:1px solid #ddd;
+  border-radius:12px;
+  padding:20px;
+  margin-bottom:20px;
+  background:#fafafa;
 }
 
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:10px;font-size:14px}
-th,td{padding:12px;text-align:center}
-th{background:linear-gradient(90deg,var(--primary),var(--secondary));color:#fff;position:sticky;top:0}
-tr:nth-child(even){background:#fafafa}
-tr:hover{background:#f3e5f5}
+.event-title{
+  font-size:18px;
+  font-weight:bold;
+  color:var(--primary);
+  margin-bottom:10px;
+}
 
-#totals tr:nth-child(1){background:linear-gradient(90deg,#fff8e1,#ffe0b2);font-weight:bold;border-left:6px solid var(--gold)}
-#totals tr:nth-child(1) td{color:#bf360c}
-#totals tr:nth-child(2){border-left:6px solid var(--silver)}
-#totals tr:nth-child(3){border-left:6px solid var(--bronze)}
+.result-line{
+  padding:6px 0;
+  border-bottom:1px dashed #ccc;
+}
 
-.badge{display:inline-block;padding:4px 10px;border-radius:14px;font-size:12px;font-weight:bold}
-.badge.gold{background:linear-gradient(90deg,#ffd700,#ffecb3);color:#5d4037}
-.badge.silver{background:#e0e0e0;color:#424242}
-.badge.bronze{background:#f3d0b0;color:#5d4037}
+.result-line:last-child{border-bottom:none}
+
+.badge{font-weight:bold;padding:4px 10px;border-radius:12px;font-size:13px}
+.gold{background:#ffd700;color:#5d4037}
+.silver{background:#e0e0e0;color:#424242}
+.bronze{background:#f3d0b0;color:#5d4037}
 
 footer{background:linear-gradient(135deg,#2c0a2f,var(--primary));color:white;text-align:center;padding:18px;margin-top:50px;border-radius:0 0 18px 18px;font-size:13px}
-
-@media(max-width:768px){
-  table{font-size:12px}
-  header h1{font-size:28px}
-}
 </style>
 </head>
+
 <body>
+
 <header>
   <img src="logo.png">
   <h1>NATTYA 2026</h1>
@@ -54,39 +60,11 @@ footer{background:linear-gradient(135deg,#2c0a2f,var(--primary));color:white;tex
 <div class="container">
 
 <h2>🎭 Event Results</h2>
-<input type="text" id="search" class="search-box" placeholder="Search by event, participant, group, department" onkeyup="filterResults()">
+<input type="text" id="search" class="search-box"
+ placeholder="Search by event, participant, group, department"
+ onkeyup="filterResults()">
 
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-  <th>Event</th>
-  <th>Participant(s)</th>
-  <th>Department</th>
-  <th>Year</th>
-  <th>Group</th>
-  <th>Position</th>
-  <th>Points</th>
-</tr>
-</thead>
-<tbody id="results"></tbody>
-</table>
-</div>
-
-<h2>🏆 Championship Leaderboard</h2>
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-  <th>Rank</th>
-  <th>Group</th>
-  <th>Total Points</th>
-  <th>Status</th>
-</tr>
-</thead>
-<tbody id="totals"></tbody>
-</table>
-</div>
+<div id="eventResults"></div>
 
 <footer>
 © NATTYA 2026 – College Youth Festival<br>
@@ -97,46 +75,54 @@ Official Results Portal
 
 <script>
 let data = JSON.parse(localStorage.getItem('nattya') || '[]');
-let res = document.getElementById('results');
-let totalsObj = {Mudhra:0, Lasya:0, Kavya:0};
 
-// Sort by event then by position order
-const posOrder = {First:1, Second:2, Third:3};
-data.sort((a,b)=> a.event.localeCompare(b.event) || posOrder[a.position] - posOrder[b.position]);
-
+// Group results by event
+let eventsMap = {};
 data.forEach(d=>{
-  let r = res.insertRow();
-  r.insertCell(0).innerText = d.event || '-';
-  r.insertCell(1).innerText = d.participant || '-';
-  r.insertCell(2).innerText = d.department || '-';
-  r.insertCell(3).innerText = d.year || '-';
-  r.insertCell(4).innerText = d.group || '-';
-  r.insertCell(5).innerText = d.position || '-';
-  r.insertCell(6).innerText = d.points || 0;
-  totalsObj[d.group] += d.points || 0;
+  if(!eventsMap[d.event]) eventsMap[d.event] = {};
+  eventsMap[d.event][d.position] = d;
 });
 
-let totalsArr = Object.entries(totalsObj)
-  .map(([group,points])=>({group,points}))
-  .sort((a,b)=>b.points - a.points);
+// Order positions
+const posOrder = ["First","Second","Third"];
 
-let totals = document.getElementById('totals');
-totalsArr.forEach((g,i)=>{
-  let r = totals.insertRow();
-  r.insertCell(0).innerText = i + 1;
-  r.insertCell(1).innerText = g.group;
-  r.insertCell(2).innerText = g.points;
-  let status = r.insertCell(3);
-  if(i === 0) status.innerHTML = '<span class="badge gold">Champion</span>';
-  else if(i === 1) status.innerHTML = '<span class="badge silver">Runner-up</span>';
-  else if(i === 2) status.innerHTML = '<span class="badge bronze">2nd Runner-up</span>';
+let container = document.getElementById("eventResults");
+
+Object.keys(eventsMap).sort().forEach(eventName=>{
+  let card = document.createElement("div");
+  card.className = "event-card";
+
+  let title = document.createElement("div");
+  title.className = "event-title";
+  title.innerText = eventName;
+  card.appendChild(title);
+
+  posOrder.forEach(pos=>{
+    let r = eventsMap[eventName][pos];
+    if(r){
+      let line = document.createElement("div");
+      line.className = "result-line";
+
+      let badgeClass = pos==="First"?"gold":pos==="Second"?"silver":"bronze";
+
+      line.innerHTML = `
+        <span class="badge ${badgeClass}">${pos}</span>
+        &nbsp; ${r.participant || "-"}
+        &nbsp; <b>(${r.group})</b>
+        &nbsp; – ${r.department || ""}
+      `;
+      card.appendChild(line);
+    }
+  });
+
+  container.appendChild(card);
 });
 
 function filterResults(){
-  let q = document.getElementById('search').value.toLowerCase();
-  let rows = document.querySelectorAll('#results tr');
-  rows.forEach(r=>{
-    r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
+  let q = search.value.toLowerCase();
+  [...document.querySelectorAll(".event-card")].forEach(card=>{
+    card.style.display =
+      card.innerText.toLowerCase().includes(q) ? "" : "none";
   });
 }
 </script>
