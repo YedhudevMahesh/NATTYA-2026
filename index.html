@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NAATTYA 2026 – Official Results</title>
+<title>NATTYA 2026 – Official Results</title>
 
 <style>
 :root{
@@ -25,7 +25,10 @@ header{
   padding:35px;
   text-align:center;
 }
-header img{height:90px;margin-bottom:10px}
+header img{
+  height:90px;
+  margin-bottom:10px;
+}
 header h1{margin:0;font-size:36px;letter-spacing:2px}
 header p{margin:6px 0 0;font-size:15px;opacity:.9}
 
@@ -38,9 +41,20 @@ header p{margin:6px 0 0;font-size:15px;opacity:.9}
   box-shadow:0 15px 35px rgba(0,0,0,.12);
 }
 h2{
+  margin-top:10px;
   color:var(--primary);
   border-left:6px solid var(--secondary);
   padding-left:12px;
+  font-size:22px;
+}
+
+.search-box{
+  width:100%;
+  padding:12px;
+  margin:15px 0 25px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:15px;
 }
 
 .event-card{
@@ -59,6 +73,9 @@ h2{
 .result-line{
   padding:8px 0;
   border-bottom:1px dashed #ccc;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 .result-line:last-child{border-bottom:none}
 
@@ -68,16 +85,33 @@ h2{
   border-radius:14px;
   font-size:12px;
   font-weight:bold;
-  margin-bottom:4px;
 }
-.badge.gold{background:#ffd700}
-.badge.silver{background:#e0e0e0}
-.badge.bronze{background:#f3d0b0}
+.badge.gold{background:linear-gradient(90deg,#ffd700,#ffecb3);color:#5d4037}
+.badge.silver{background:#e0e0e0;color:#424242}
+.badge.bronze{background:#f3d0b0;color:#5d4037}
 
-.winner{
-  margin-left:10px;
+.details{font-size:14px}
+.points{font-weight:bold;color:var(--primary)}
+
+.table-wrap{overflow-x:auto}
+table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  margin-top:20px;
   font-size:14px;
 }
+th,td{padding:12px;text-align:center}
+th{background:linear-gradient(90deg,var(--primary),var(--secondary));color:#fff}
+tr:nth-child(even){background:#fafafa}
+
+#totals tr:nth-child(1){
+  background:linear-gradient(90deg,#fff8e1,#ffe0b2);
+  font-weight:bold;
+  border-left:6px solid var(--gold)
+}
+#totals tr:nth-child(2){border-left:6px solid var(--silver)}
+#totals tr:nth-child(3){border-left:6px solid var(--bronze)}
 
 footer{
   background:linear-gradient(135deg,#2c0a2f,var(--primary));
@@ -85,6 +119,8 @@ footer{
   text-align:center;
   padding:18px;
   margin-top:50px;
+  border-radius:0 0 18px 18px;
+  font-size:13px;
 }
 </style>
 </head>
@@ -92,39 +128,61 @@ footer{
 <body>
 
 <header>
-  <img src="college-logo-1 (7).png">
-  <h1>NAATTYA 2026</h1>
+  <!-- LOGO FIXED HERE -->
+  <img src="college-logo-1 (7).png" alt="College Logo">
+  <h1>NATTYA 2026</h1>
   <p>College Youth Festival – Official Results</p>
 </header>
 
 <div class="container">
+
 <h2>🎭 Event-wise Results</h2>
+<input type="text" id="search" class="search-box"
+ placeholder="Search by event, participant, group, department"
+ onkeyup="filterResults()">
+
 <div id="eventResults"></div>
+
+<h2>🏆 Championship Leaderboard</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+  <th>Rank</th>
+  <th>Group</th>
+  <th>Total Points</th>
+</tr>
+</thead>
+<tbody id="totals"></tbody>
+</table>
 </div>
 
 <footer>
-© NAATTYA 2026 – College Youth Festival
+© NATTYA 2026 – College Youth Festival<br>
+Official Results Portal
 </footer>
+
+</div>
 
 <script>
 fetch("results.json")
   .then(res => res.json())
-  .then(data => buildPage(data));
+  .then(data => buildPage(data))
+  .catch(() => {
+    document.getElementById("eventResults").innerHTML =
+      "<b>No results published yet.</b><br>Admin must upload results.json";
+  });
 
 function buildPage(data){
 
   let eventsMap = {};
-
   data.forEach(d=>{
     if(!eventsMap[d.event]) eventsMap[d.event] = {};
-    if(!eventsMap[d.event][d.position])
-      eventsMap[d.event][d.position] = [];
-    eventsMap[d.event][d.position].push(d);
+    eventsMap[d.event][d.position] = d;
   });
 
+  let totalsObj = {Mudhra:0, Lasya:0, Kavya:0};
   const posOrder = ["First","Second","Third"];
-  const posClass = {First:"gold", Second:"silver", Third:"bronze"};
-
   let container = document.getElementById("eventResults");
 
   Object.keys(eventsMap).sort().forEach(eventName=>{
@@ -137,30 +195,57 @@ function buildPage(data){
     card.appendChild(title);
 
     posOrder.forEach(pos=>{
-      let list = eventsMap[eventName][pos];
-      if(list){
+      let r = eventsMap[eventName][pos];
+      if(r){
         let line = document.createElement("div");
         line.className = "result-line";
 
         let badge = document.createElement("span");
-        badge.className = "badge " + posClass[pos];
+        badge.className = "badge " +
+          (pos === "First" ? "gold" :
+           pos === "Second" ? "silver" : "bronze");
         badge.innerText = pos;
+
+        let detail = document.createElement("div");
+        detail.className = "details";
+        detail.innerHTML =
+          `<b>${r.participant || '-'}</b> (${r.group})<br>
+           <small>${r.department || ''} • ${r.year || ''}</small>`;
+
+        let pts = document.createElement("div");
+        pts.className = "points";
+        pts.innerText = r.points + " pts";
+
         line.appendChild(badge);
-
-        list.forEach(r=>{
-          let w = document.createElement("div");
-          w.className = "winner";
-          w.innerHTML =
-            `<b>${r.participant}</b> (${r.group})
-             <small> • ${r.department || ''} ${r.year || ''}</small>`;
-          line.appendChild(w);
-        });
-
+        line.appendChild(detail);
+        line.appendChild(pts);
         card.appendChild(line);
+
+        totalsObj[r.group] += r.points || 0;
       }
     });
 
     container.appendChild(card);
+  });
+
+  let totalsArr = Object.entries(totalsObj)
+    .map(([group,points])=>({group,points}))
+    .sort((a,b)=>b.points - a.points);
+
+  let totals = document.getElementById('totals');
+  totalsArr.forEach((g,i)=>{
+    let r = totals.insertRow();
+    r.insertCell(0).innerText = i + 1;
+    r.insertCell(1).innerText = g.group;
+    r.insertCell(2).innerText = g.points;
+  });
+}
+
+function filterResults(){
+  let q = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.event-card').forEach(card=>{
+    card.style.display =
+      card.innerText.toLowerCase().includes(q) ? '' : 'none';
   });
 }
 </script>
