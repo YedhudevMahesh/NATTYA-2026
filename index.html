@@ -25,10 +25,7 @@ header{
   padding:35px;
   text-align:center;
 }
-header img{
-  height:90px;
-  margin-bottom:10px;
-}
+header img{height:90px;margin-bottom:10px}
 header h1{margin:0;font-size:36px;letter-spacing:2px}
 header p{margin:6px 0 0;font-size:15px;opacity:.9}
 
@@ -41,7 +38,6 @@ header p{margin:6px 0 0;font-size:15px;opacity:.9}
   box-shadow:0 15px 35px rgba(0,0,0,.12);
 }
 h2{
-  margin-top:10px;
   color:var(--primary);
   border-left:6px solid var(--secondary);
   padding-left:12px;
@@ -73,9 +69,6 @@ h2{
 .result-line{
   padding:8px 0;
   border-bottom:1px dashed #ccc;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
 }
 .result-line:last-child{border-bottom:none}
 
@@ -85,13 +78,23 @@ h2{
   border-radius:14px;
   font-size:12px;
   font-weight:bold;
+  margin-bottom:6px;
 }
-.badge.gold{background:linear-gradient(90deg,#ffd700,#ffecb3);color:#5d4037}
-.badge.silver{background:#e0e0e0;color:#424242}
-.badge.bronze{background:#f3d0b0;color:#5d4037}
+.badge.gold{background:linear-gradient(90deg,#ffd700,#ffecb3)}
+.badge.silver{background:#e0e0e0}
+.badge.bronze{background:#f3d0b0}
 
-.details{font-size:14px}
-.points{font-weight:bold;color:var(--primary)}
+.winner{
+  margin-left:12px;
+  font-size:14px;
+  margin-bottom:4px;
+}
+
+.points{
+  font-weight:bold;
+  color:var(--primary);
+  margin-left:12px;
+}
 
 .table-wrap{overflow-x:auto}
 table{
@@ -128,7 +131,6 @@ footer{
 <body>
 
 <header>
-  <!-- LOGO FIXED HERE -->
   <img src="college-logo-1 (7).png" alt="College Logo">
   <h1>NATTYA 2026</h1>
   <p>College Youth Festival – Official Results</p>
@@ -178,7 +180,9 @@ function buildPage(data){
   let eventsMap = {};
   data.forEach(d=>{
     if(!eventsMap[d.event]) eventsMap[d.event] = {};
-    eventsMap[d.event][d.position] = d;
+    if(!eventsMap[d.event][d.position])
+      eventsMap[d.event][d.position] = [];
+    eventsMap[d.event][d.position].push(d);
   });
 
   let totalsObj = {Mudhra:0, Lasya:0, Kavya:0};
@@ -195,8 +199,8 @@ function buildPage(data){
     card.appendChild(title);
 
     posOrder.forEach(pos=>{
-      let r = eventsMap[eventName][pos];
-      if(r){
+      let list = eventsMap[eventName][pos];
+      if(list){
         let line = document.createElement("div");
         line.className = "result-line";
 
@@ -205,23 +209,21 @@ function buildPage(data){
           (pos === "First" ? "gold" :
            pos === "Second" ? "silver" : "bronze");
         badge.innerText = pos;
-
-        let detail = document.createElement("div");
-        detail.className = "details";
-        detail.innerHTML =
-          `<b>${r.participant || '-'}</b> (${r.group})<br>
-           <small>${r.department || ''} • ${r.year || ''}</small>`;
-
-        let pts = document.createElement("div");
-        pts.className = "points";
-        pts.innerText = r.points + " pts";
-
         line.appendChild(badge);
-        line.appendChild(detail);
-        line.appendChild(pts);
-        card.appendChild(line);
 
-        totalsObj[r.group] += r.points || 0;
+        list.forEach(r=>{
+          let w = document.createElement("div");
+          w.className = "winner";
+          w.innerHTML =
+            `<b>${r.participant}</b> (${r.group})
+             <small> • ${r.department || ''} ${r.year || ''}</small>
+             <span class="points">(${r.points} pts)</span>`;
+          line.appendChild(w);
+
+          totalsObj[r.group] += r.points || 0;
+        });
+
+        card.appendChild(line);
       }
     });
 
